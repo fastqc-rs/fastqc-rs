@@ -33,9 +33,12 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
 
         let gc: Vec<_> = sequence
             .iter()
-            .filter(|b| b == &&b'G' || b == &&b'C')
+            .filter(|b| b == &&b'G' || b == &&b'C' || b == &&b'g' || b == &&b'c')
             .collect();
-        let without_n: Vec<_> = sequence.iter().filter(|b| b != &&b'N').collect();
+        let without_n: Vec<_> = sequence
+            .iter()
+            .filter(|b| b != &&b'N' && b != &&b'n')
+            .collect();
         gc_content.push((gc.len() * 100) / without_n.len());
 
         let mean_read_quality = if let Some(qualities) = seqrec.qual() {
