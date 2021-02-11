@@ -8,7 +8,10 @@
   "encoding": {
     "color": {
       "field": "type",
-      "type": "nominal"
+      "type": "nominal",
+      "scale": {
+        "range": ["#8A0829"]
+      }
     },
     "x": {"field": "gc_pct", "type": "quantitative", "title": "Mean GC content"},
     "y": {"field": "count", "type": "quantitative", "title": null}

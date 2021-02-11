@@ -8,6 +8,7 @@
   "mark": "bar",
   "encoding": {
     "y": {"field": "length", "type": "nominal", "axis": {"labelAngle": 0}},
-    "x": {"field": "count", "type": "quantitative"}
+    "x": {"field": "count", "type": "quantitative"},
+    "color": {"value":"#8A0829"}
   }
 }
