@@ -5,7 +5,7 @@
 [![Crates.io](https://img.shields.io/crates/v/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
 [![Crates.io](https://img.shields.io/crates/l/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
 
-A fast quality control tool for FASTQ files written in rust.
+A fast quality control tool for FASTQ files written in rust inspired by [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 
 Available statistics are:
 - Read length
