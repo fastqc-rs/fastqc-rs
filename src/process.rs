@@ -119,7 +119,7 @@ pub(crate) fn process<P: AsRef<Path>>(filename: P, k: u8) -> Result<(), Box<dyn 
         let count = temp_gc.entry(content).or_insert_with(|| 0_u64);
         *count += 1;
     }
-    for (perc , count) in temp_gc {
+    for (perc, count) in temp_gc {
         gc_data.push(json!({"gc_pct": perc, "count": count, "type": "gc"}))
     }
 
