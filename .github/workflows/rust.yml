@@ -40,3 +40,19 @@ jobs:
          uses: actions-rs/clippy-check@v1
          with:
            token: ${{ secrets.GITHUB_TOKEN }}
+           
+  Testing:
+    needs: Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Run cargo test
+        run: cargo test
