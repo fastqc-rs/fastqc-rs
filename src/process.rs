@@ -21,11 +21,13 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     let mut read_lengths = HashMap::new();
     let mut kmers = HashMap::new();
     let mut gc_content = Vec::new();
+    let mut read_count = 0;
     let mut reader = parse_fastx_file(&filename).expect("valid path/file");
 
     // Gather data from every record
     while let Some(record) = reader.next() {
         let seqrec = record.expect("invalid record");
+        read_count += 1;
 
         let sequence = seqrec.seq();
         let count_read_length = read_lengths.entry(sequence.len()).or_insert_with(|| 0);
@@ -168,6 +170,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         "file name": {"name": "file name", "value": file},
         "canonical": {"name": "canonical", "value": "True"},
         "k": {"name": "k", "value": k},
+        "reads": {"name": "reads", "value": read_count},
     });
 
     let mut templates = Tera::default();
