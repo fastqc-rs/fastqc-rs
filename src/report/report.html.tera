@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>fastqc-rs report</title>
+        <style>
+            {{ "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" | embed_source | safe }}
+        </style>
+        <script>
+            {{ "https://code.jquery.com/jquery-3.3.1.slim.min.js" | embed_source | safe }}
+        </script>
+        <script>
+            {{ "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" | embed_source | safe }}
+        </script>
+        <script>
+            {{ "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" | embed_source | safe }}
+        </script>
+        <script>
+            {{ "https://cdn.jsdelivr.net/npm/vega@5.17.0" | embed_source | safe }}
+        </script>
+        <script>
+            {{ "https://cdn.jsdelivr.net/npm/vega-lite@4.17.0" | embed_source | safe }}
+        </script>
+        <script>
+            {{ "https://cdn.jsdelivr.net/npm/vega-embed@6.12.2" | embed_source | safe }}
+        </script>
+        <style>
+            .custom-pill {
+                color: #8A0829;
+            }
+            .custom-pill a:hover {
+                color: darkgrey;
+            }
+            .custom-pill .active {
+                background-color: #8A0829 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #8A0829;">
+            <a class="navbar-brand" href="#">fastqc-rs report</a>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link">version {{ version }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="hhttps://github.com/fxwiegand/fastqc-rs">github</a>
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    created {{ time }}
+                </span>
+            </div>
+        </nav>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color: lightgrey;">
+                <li class="breadcrumb-item active" aria-current="page">Report</li>
+            </ol>
+        </nav>
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills custom-pill" id="v-pills-tab" role="tablist" aria-orientation="vertical" style="padding-left: 15px;">
+                    {% for title, dict in plots %}
+                    <a class="nav-link custom-pill {% if loop.first %}active{% endif %}" id="v-pills-{{ dict.short }}-tab" data-toggle="pill" href="#v-pills-{{ dict.short }}" role="tab" aria-controls="v-pills-{{ dict.short }}" aria-selected="{% if loop.first %}true{% else %}false{% endif %}">{{ title }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="tab-content" id="v-pills-tabContent" style="height: calc(100vh - 175px); overflow: auto">
+                    {% for title, dict in plots %}
+                    <div class="tab-pane fade show {% if loop.first %}active{% endif %}" id="v-pills-{{ dict.short }}" role="tabpanel" aria-labelledby="v-pills-{{ dict.short }}-tab">
+                        <div id="{{ dict.short }}-div"></div>
+                        <script>
+                        var {{ dict.short }}Spec = {{ dict.specs }};
+                        // Embed the visualization in the container with id `vis`
+                        vegaEmbed('#{{ dict.short }}-div', {{ dict.short }}Spec);
+                        </script>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-2" style="overflow: auto">
+                <table class="table table-sm">
+                    {% for title, dict in meta %}
+                        <tr>
+                            <th>
+                                {{ dict.name }}
+                            </th>
+                            <td>
+                                {{ dict.value }}
+                            </td>
+                        </tr>
+                    {% endfor%}
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

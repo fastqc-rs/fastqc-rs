@@ -1,0 +1,16 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "description": "GC distribution over all sequences",
+  "title": "GC distribution over all sequences",
+  "width": 500,
+  "data": {"values": []},
+  "mark": {"type": "line", "interpolate": "basis"},
+  "encoding": {
+    "color": {
+      "field": "type",
+      "type": "nominal"
+    },
+    "x": {"field": "gc_pct", "type": "quantitative", "title": "Mean GC content"},
+    "y": {"field": "count", "type": "quantitative", "title": null}
+  }
+}

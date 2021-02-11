@@ -1,0 +1,51 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "data": {"values": []},
+  "hconcat": [{
+    "mark": "bar",
+    "transform": [{
+      "filter": {"selection": "brush"}
+    }],
+    "encoding": {
+    "y": {
+      "field": "k_mer",
+      "type": "ordinal",
+      "sort": "-x",
+      "title": "k-mer"
+    },
+    "x": {
+      "field": "count",
+      "type": "quantitative",
+      "title": "k-mer frequency"
+    },
+    "tooltip": {
+    "field": "count"
+    }
+  }
+  }, {
+    "height": 200,
+    "width": 50,
+    "selection": {
+      "brush": {
+        "type": "interval",
+        "encodings": ["y"]
+      }
+    },
+    "mark": "bar",
+    "encoding": {
+    "y": {
+      "field": "k_mer",
+      "type": "ordinal",
+      "sort": "-x",
+      "title": "k-mer",
+      "axis": null
+    },
+    "x": {
+      "field": "count",
+      "type": "quantitative",
+      "title": "k-mer frequency"
+    }
+  }
+  }]
+}
+

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "description": "Base per pos quantity",
+  "title": "Base per pos quantity",
+  "width": 500,
+  "height": 300,
+  "data": {"values": []},
+  "mark": {"type": "line"},
+  "selection": {
+      "hover": {
+        "type": "single",
+        "on": "mouseover",
+        "empty": "all",
+        "fields": ["base"]
+      }
+    },
+  "encoding": {
+    "x": {"field": "pos", "type": "quantitative", "title": "Position in read (bp)"},
+    "y": {"field": "count", "type": "quantitative", "title": "Base content"},
+    "color": {
+        "field":"base",
+        "type":"nominal"
+    },
+    "opacity": {
+      "condition": {
+        "selection": "hover",
+        "value": 1
+      },
+      "value": 0.3
+    }
+  }
+}

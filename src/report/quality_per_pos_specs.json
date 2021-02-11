@@ -1,0 +1,50 @@
+{
+  "title": "Phred score",
+    "width": 500,
+  "data": {
+    "values": []
+  },
+  "encoding": {
+    "y": {"field": "pos", "type": "nominal", "title": "Position in read (bp)"},
+    "tooltip":  [
+      {"field": "pos", "title": "Position in read (bp)"},
+      {"field": "average", "title": "Average of phred score"},
+      {"field": "upper", "title": "Max of phred score"},
+      {"field": "q3", "title": "Q3 of phred score"},
+      {"field": "median", "title": "Median of phred score"},
+      {"field": "q1", "title": "Q1 of phred score"},
+      {"field": "lower", "title": "Min of phred score"}
+    ]
+  },
+  "layer": [
+    {
+      "mark": {"type": "rule"},
+      "encoding": {
+        "x": {"field": "lower", "type": "quantitative","scale": {"zero": false}, "title": null},
+        "x2": {"field": "upper"}
+      }
+    },
+    {
+      "mark": {"type": "bar", "size": 14},
+      "encoding": {
+        "x": {"field": "q1", "type": "quantitative"},
+        "x2": {"field": "q3"}
+      }
+    },
+    {
+      "mark": {"type": "tick", "color": "white", "size": 14},
+      "encoding": {
+        "x": {"field": "median", "type": "quantitative"}
+      }
+    },
+    {
+      "mark": {"type": "line", "interpolate": "basis"},
+      "encoding": {
+        "x": {"field": "average", "type": "quantitative","scale": {"zero": false}, "title": "Phred score"},
+        "color": {
+          "value": "red"
+        }
+      }
+    }
+  ]
+}

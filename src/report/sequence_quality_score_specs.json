@@ -1,0 +1,12 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "description": "Sequence quality scores",
+  "title": "Sequence quality scores",
+  "width": 500,
+  "data": {"values": []},
+  "mark": {"type": "line", "interpolate": "basis"},
+  "encoding": {
+    "x": {"field": "score", "type": "quantitative", "title": "Phred score"},
+    "y": {"field": "count", "type": "quantitative", "title": "Occurrences of mean read qualities"}
+  }
+}

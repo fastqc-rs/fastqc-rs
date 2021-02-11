@@ -1,0 +1,13 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "description": "Read lengths distribution",
+  "title": "Read lengths distribution",
+  "data": {
+    "values": []
+  },
+  "mark": "bar",
+  "encoding": {
+    "y": {"field": "length", "type": "nominal", "axis": {"labelAngle": 0}},
+    "x": {"field": "count", "type": "quantitative"}
+  }
+}
