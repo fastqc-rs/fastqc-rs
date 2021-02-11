@@ -32,7 +32,7 @@ pub(crate) fn process<P: AsRef<Path>>(filename: P, k: u8) -> Result<(), Box<dyn 
             .filter(|b| b == &&b'G' || b == &&b'C')
             .collect();
         let without_n: Vec<_> = sequence.iter().filter(|b| b != &&b'N').collect();
-        gc_content.push(gc.len() / without_n.len());
+        gc_content.push((gc.len() * 100) / without_n.len());
 
         let mean_read_quality = if let Some(qualities) = seqrec.qual() {
             qualities.iter().map(|q| (q - 33) as u64).sum::<u64>() / qualities.len() as u64
@@ -112,11 +112,25 @@ pub(crate) fn process<P: AsRef<Path>>(filename: P, k: u8) -> Result<(), Box<dyn 
     let mut counter_specs: Value = serde_json::from_str(include_str!("report/counter_specs.json"))?;
     counter_specs["data"]["values"] = json!(kmer_data);
 
+    // Data for GC content
+    let mut gc_data = Vec::new();
+    let mut temp_gc = HashMap::new();
+    for content in gc_content {
+        let count = temp_gc.entry(content).or_insert_with(|| 0_u64);
+        *count += 1;
+    }
+    for (perc , count) in temp_gc {
+        gc_data.push(json!({"gc_pct": perc, "count": count, "type": "gc"}))
+    }
+
+    let mut gc_specs: Value = serde_json::from_str(include_str!("report/gc_content_specs.json"))?;
+    gc_specs["data"]["values"] = json!(gc_data);
+
     // Data for base quality per position
     let mut base_per_pos_data = Vec::new();
     for (position, qualities) in base_quality_count {
         let quartiles = Quartiles::new(&qualities);
-        let avg = qualities.iter().map(|q| *q as u64).sum::<u64>() / qualities.len() as u64;
+        let avg = qualities.iter().map(|q| *q as f64).sum::<f64>() / qualities.len() as f64;
         let values = quartiles.values();
         base_per_pos_data.push(json!({
         "pos": position,
@@ -135,6 +149,7 @@ pub(crate) fn process<P: AsRef<Path>>(filename: P, k: u8) -> Result<(), Box<dyn 
 
     let plots = json!({
         "k-mer quantities": {"short": "count", "specs": counter_specs.to_string()},
+        "gc content": {"short": "gc", "specs": gc_specs.to_string()},
         "base sequence quality": {"short": "base", "specs": qpp_specs.to_string()},
         "sequence quality score": {"short": "qual", "specs": sqc_specs.to_string()},
         "base sequence content": {"short": "cont", "specs": bpp_specs.to_string()},

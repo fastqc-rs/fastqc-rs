@@ -7,6 +7,7 @@ Available statistics are:
 - Sequence quality per base
 - Sequence content per base
 - k-mer content
+- GC content
 
 ## Usage
 
