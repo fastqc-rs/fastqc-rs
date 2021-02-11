@@ -5,12 +5,16 @@ use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
+use std::ffi::OsStr;
 use std::io;
 use std::io::Write;
 use std::path::Path;
 use tera::{self, Context, Tera};
 
-pub(crate) fn process<P: AsRef<Path>>(filename: P, k: u8) -> Result<(), Box<dyn Error>> {
+pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
+    filename: P,
+    k: u8,
+) -> Result<(), Box<dyn Error>> {
     let mut mean_read_qualities = HashMap::new();
     let mut base_count = HashMap::new();
     let mut base_quality_count = HashMap::new();
@@ -156,7 +160,9 @@ pub(crate) fn process<P: AsRef<Path>>(filename: P, k: u8) -> Result<(), Box<dyn 
         "read lengths": {"short": "rlen", "specs": rle_specs.to_string()},
     });
 
+    let file = Path::new(&filename).file_name().unwrap().to_str().unwrap();
     let meta = json!({
+        "file name": {"name": "file name", "value": file},
         "canonical": {"name": "canonical", "value": "True"},
         "k": {"name": "k", "value": k},
     });
