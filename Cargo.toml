@@ -3,6 +3,10 @@ name = "fastqc-rs"
 version = "0.1.0"
 authors = ["Felix Wiegand <fxwiegand@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "A fast quality control tool for FASTQ files written in rust"
+repository = "https://github.com/fxwiegand/fastqc-rs"
+keywords = ["fastq"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -14,3 +18,7 @@ plotters = "0.3.0"
 tera = "1.6.1"
 chrono = "0.4.19"
 reqwest = "0.9.0"
+
+[[bin]]
+name = "fqc"
+path = "src/main.rs"
