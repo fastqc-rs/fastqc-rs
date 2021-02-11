@@ -1,5 +1,12 @@
 # fastqc-rs
-A fast quality control tool for FASTQ files written in rust. 
+A fast quality control tool for FASTQ files written in rust.
+
+Available statistics are:
+- Read length
+- Sequence quality score
+- Sequence quality per base
+- Sequence content per base
+- k-mer content
 
 ## Usage
 
