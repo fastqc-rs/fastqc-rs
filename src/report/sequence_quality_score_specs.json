@@ -8,6 +8,6 @@
   "encoding": {
     "x": {"field": "score", "type": "quantitative", "title": "Phred score"},
     "y": {"field": "count", "type": "quantitative", "title": "Occurrences of mean read qualities"},
-    "color": {"value":"#8A0829"}
+    "color": {"value":"#54785a"}
   }
 }

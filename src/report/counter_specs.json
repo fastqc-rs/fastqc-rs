@@ -18,7 +18,7 @@
       "type": "quantitative",
       "title": "k-mer frequency"
     },
-    "color": {"value":"#8A0829"},
+    "color": {"value":"#54785a"},
     "tooltip": {
     "field": "count"
     }
@@ -46,7 +46,7 @@
       "type": "quantitative",
       "title": "k-mer frequency"
     },
-    "color": {"value":"#8A0829"}
+    "color": {"value":"#54785a"}
     }
   }]
 }

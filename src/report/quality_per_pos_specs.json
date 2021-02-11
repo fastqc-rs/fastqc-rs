@@ -29,7 +29,7 @@
       "encoding": {
         "x": {"field": "q1", "type": "quantitative"},
         "x2": {"field": "q3"},
-        "color": {"value":"#8A0829"}
+        "color": {"value":"#54785a"}
       }
     },
     {
@@ -43,7 +43,7 @@
       "encoding": {
         "x": {"field": "average", "type": "quantitative","scale": {"zero": false}, "title": "Phred score"},
         "color": {
-          "value": "grey"
+          "value": "red"
         }
       }
     }

@@ -26,18 +26,18 @@
         </script>
         <style>
             .custom-pill {
-                color: #8A0829;
+                color: #54785a;
             }
             .custom-pill a:hover {
                 color: darkgrey;
             }
             .custom-pill .active {
-                background-color: #8A0829 !important;
+                background-color: #54785a !important;
             }
         </style>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #8A0829;">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #54785a;">
             <a class="navbar-brand" href="#">fastqc-rs report</a>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">

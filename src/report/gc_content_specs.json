@@ -10,7 +10,7 @@
       "field": "type",
       "type": "nominal",
       "scale": {
-        "range": ["#8A0829"]
+        "range": ["#54785a"]
       }
     },
     "x": {"field": "gc_pct", "type": "quantitative", "title": "Mean GC content"},
