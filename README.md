@@ -1,4 +1,10 @@
 # fastqc-rs
+
+![Rust](https://github.com/fxwiegand/fastqc-rs/workflows/Rust/badge.svg)
+[![Crates.io](https://img.shields.io/crates/d/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
+[![Crates.io](https://img.shields.io/crates/v/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
+[![Crates.io](https://img.shields.io/crates/l/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
+
 A fast quality control tool for FASTQ files written in rust.
 
 Available statistics are:
