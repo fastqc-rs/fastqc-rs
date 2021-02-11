@@ -12,7 +12,7 @@ Available statistics are:
 ## Usage
 
 ```
-fastqc-rs -q path/to/my_sequence.fastq > report.html
+fqc -q path/to/my_sequence.fastq > report.html
 ```
 
 Arguments: 
