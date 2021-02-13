@@ -23,3 +23,7 @@ itertools = "0.10.0"
 [[bin]]
 name = "fqc"
 path = "src/main.rs"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
