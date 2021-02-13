@@ -1,4 +1,5 @@
 use chrono::{DateTime, Local};
+use itertools::Itertools;
 use needletail::{parse_fastx_file, Sequence};
 use plotters::prelude::*;
 use serde_json::json;
@@ -6,6 +7,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::OsStr;
+use std::fs::File;
 use std::io;
 use std::io::Write;
 use std::path::Path;
@@ -14,6 +16,7 @@ use tera::{self, Context, Tera};
 pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     filename: P,
     k: u8,
+    summary: Option<P>,
 ) -> Result<(), Box<dyn Error>> {
     let mut mean_read_qualities = HashMap::new();
     let mut base_count = HashMap::new();
@@ -21,7 +24,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     let mut read_lengths = HashMap::new();
     let mut kmers = HashMap::new();
     let mut gc_content = Vec::new();
-    let mut read_count = 0;
+    let mut read_count = 0_u64;
     let mut reader = parse_fastx_file(&filename).expect("valid path/file");
 
     // Gather data from every record
@@ -30,7 +33,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         read_count += 1;
 
         let sequence = seqrec.seq();
-        let count_read_length = read_lengths.entry(sequence.len()).or_insert_with(|| 0);
+        let count_read_length = read_lengths.entry(sequence.len()).or_insert_with(|| 0_u64);
         *count_read_length += 1;
 
         let gc: Vec<_> = sequence
@@ -79,10 +82,25 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
             *count += 1;
         }
     }
+    // Average gc content
+    let avg_gc = gc_content.iter().sum::<usize>() as f32 / gc_content.len() as f32;
 
     // Data for base per position
     let mut base_count_data = Vec::new();
+    let mut base_count_percentage = HashMap::new();
+    let mut gc_content_per_base = HashMap::new();
     for (position, bases) in base_count {
+        let tmp_sum = bases.values().sum::<u64>();
+        let tmp_gc = (bases.get(&'G').unwrap() + bases.get(&'C').unwrap()) as f64
+            / (tmp_sum - bases.get(&'N').unwrap()) as f64;
+        gc_content_per_base.insert(position, tmp_gc);
+        base_count_percentage.insert(
+            position,
+            bases
+                .iter()
+                .map(|(b, count)| (*b, *count as f64 / tmp_sum as f64))
+                .collect::<HashMap<char, f64>>(),
+        );
         for (base, count) in bases {
             base_count_data.push(json!({"pos": position, "count": count, "base": base}));
         }
@@ -94,9 +112,12 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
 
     // Data for read lengths
     let mut read_length_data = Vec::new();
-    for (length, count) in read_lengths {
+    let mut read_length_sum = 0_u64;
+    for (length, count) in &read_lengths {
+        read_length_sum += *length as u64 * *count as u64;
         read_length_data.push(json!({"length": length, "count": count}));
     }
+    let avg_read_length = read_length_sum / read_count as u64;
 
     let mut rle_specs: Value =
         serde_json::from_str(include_str!("report/read_lengths_specs.json"))?;
@@ -114,8 +135,22 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
 
     // Data for kmer quantities
     let mut kmer_data = Vec::new();
-    for (kmer, count) in kmers {
-        kmer_data.push(json!({"k_mer": std::str::from_utf8(&kmer).unwrap(), "count": count}))
+    for (kmer, count) in &kmers {
+        kmer_data.push(json!({"k_mer": std::str::from_utf8(kmer).unwrap(), "count": count}))
+    }
+
+    let mut overly_represented = Vec::new();
+    for (km, occ) in kmers
+        .iter()
+        .sorted_by(|(_, a), (_, b)| Ord::cmp(&b, &a))
+        .take(5)
+    {
+        let percentage = *occ as f64 / kmers.len() as f64;
+        if percentage >= 1_f64 {
+            overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "Yes"}));
+        } else if percentage >= 0.4_f64 {
+            overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "No"}));
+        };
     }
 
     let mut counter_specs: Value = serde_json::from_str(include_str!("report/counter_specs.json"))?;
@@ -170,7 +205,9 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         "file name": {"name": "file name", "value": file},
         "canonical": {"name": "canonical", "value": "True"},
         "k": {"name": "k", "value": k},
-        "reads": {"name": "reads", "value": read_count},
+        "total reads": {"name": "total reads", "value": read_count},
+        "average GC content": {"name": "average GC content", "value": avg_gc},
+        "average read length": {"name": "average read length", "value": avg_read_length},
     });
 
     let mut templates = Tera::default();
@@ -184,6 +221,29 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     context.insert("version", &env!("CARGO_PKG_VERSION"));
     let html = templates.render("report.html.tera", &context)?;
     io::stdout().write_all(html.as_bytes())?;
+
+    if let Some(path) = summary {
+        let output_path = Path::new(&path);
+        templates.add_raw_template(
+            "fastqc_summary.txt.tera",
+            include_str!("report/fastqc_summary.txt.tera"),
+        )?;
+        context.insert("filename", &file);
+        context.insert("reads", &read_count);
+        context.insert("avg_read_length", &avg_read_length);
+        context.insert("avg_gc", &avg_gc);
+        context.insert("bpp_data", &base_per_pos_data);
+        context.insert("mean_read_quality_data", &mean_read_quality_data);
+        context.insert("base_count", &base_count_percentage);
+        context.insert("read_lengths", &read_lengths);
+        context.insert("gc_data", &gc_data);
+        context.insert("gc_per_base", &gc_content_per_base);
+        context.insert("overly_represented", &overly_represented);
+        context.insert("or_empty", &overly_represented.is_empty());
+        let txt = templates.render("fastqc_summary.txt.tera", &context)?;
+        let mut file = File::create(output_path.join("fastqc_data.txt"))?;
+        file.write_all(txt.as_bytes())?;
+    }
     Ok(())
 }
 
