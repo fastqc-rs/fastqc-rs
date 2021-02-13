@@ -4,6 +4,8 @@
 [![Crates.io](https://img.shields.io/crates/d/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
 [![Crates.io](https://img.shields.io/crates/v/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
 [![Crates.io](https://img.shields.io/crates/l/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/fastqc-rs/README.html)
+[![Bioconda downloads](https://img.shields.io/conda/dn/bioconda/fastqc-rs?label=bioconda%20downloads)](https://anaconda.org/bioconda/fastqc-rs)
 
 A fast quality control tool for FASTQ files written in rust inspired by [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 
@@ -14,6 +16,29 @@ Available statistics are:
 - Sequence content per base
 - k-mer content
 - GC content
+
+## Installation
+
+There are multiple ways to install fastqc-rs:
+
+#### Bioconda
+
+fastqc-rs is available via [Bioconda](https://bioconda.github.io).
+With Bioconda set up, installation is as easy as
+
+    conda install fastqc-rs
+
+#### Cargo
+
+If the [Rust](https://www.rust-lang.org/tools/install) compiler and associated [Cargo](https://github.com/rust-lang/cargo/) are installed, fastqc-rs can be installed via
+
+    cargo install fastqc-rs
+
+#### Source
+
+Download the source code and within the root directory of source run
+
+    cargo install
 
 ## Usage
 
