@@ -148,7 +148,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         let percentage = *occ as f64 / kmers.len() as f64;
         if percentage >= 1_f64 {
             overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "Yes"}));
-        } else if percentage >= 0.4_f64 {
+        } else if percentage >= 0.2_f64 {
             overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "No"}));
         };
     }
