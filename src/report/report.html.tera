@@ -58,6 +58,18 @@
                 <li class="breadcrumb-item active" aria-current="page">Report</li>
             </ol>
         </nav>
+        {% if invalid_reads %}
+        <row>
+            <div class="col-12">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Warning!</strong> Invalid record stopped parsing the full FASTQ file.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </row>
+        {% endif %}
         <div class="row">
             <div class="col-3">
                 <div class="nav flex-column nav-pills custom-pill" id="v-pills-tab" role="tablist" aria-orientation="vertical" style="padding-left: 15px;">

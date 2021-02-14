@@ -26,60 +26,66 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     let mut gc_content = Vec::new();
     let mut read_count = 0_u64;
     let mut reader = parse_fastx_file(&filename).expect("valid path/file");
+    let mut broken_read = false;
 
     // Gather data from every record
     while let Some(record) = reader.next() {
-        let seqrec = record.expect("invalid record");
-        read_count += 1;
+        if record.is_ok() {
+            let seqrec = record.expect("Invalid record");
 
-        let sequence = seqrec.seq();
-        let count_read_length = read_lengths.entry(sequence.len()).or_insert_with(|| 0_u64);
-        *count_read_length += 1;
+            read_count += 1;
 
-        let gc: Vec<_> = sequence
-            .iter()
-            .filter(|b| b == &&b'G' || b == &&b'C' || b == &&b'g' || b == &&b'c')
-            .collect();
-        let without_n: Vec<_> = sequence
-            .iter()
-            .filter(|b| b != &&b'N' && b != &&b'n')
-            .collect();
-        gc_content.push((gc.len() * 100) / without_n.len());
+            let sequence = seqrec.seq();
+            let count_read_length = read_lengths.entry(sequence.len()).or_insert_with(|| 0_u64);
+            *count_read_length += 1;
 
-        let mean_read_quality = if let Some(qualities) = seqrec.qual() {
-            qualities.iter().map(|q| (q - 33) as u64).sum::<u64>() / qualities.len() as u64
-        } else {
-            0
-        };
+            let gc: Vec<_> = sequence
+                .iter()
+                .filter(|b| b == &&b'G' || b == &&b'C' || b == &&b'g' || b == &&b'c')
+                .collect();
+            let without_n: Vec<_> = sequence
+                .iter()
+                .filter(|b| b != &&b'N' && b != &&b'n')
+                .collect();
+            gc_content.push((gc.len() * 100) / without_n.len());
 
-        let count_qual = mean_read_qualities
-            .entry(mean_read_quality)
-            .or_insert_with(|| 0);
-        *count_qual += 1;
+            let mean_read_quality = if let Some(qualities) = seqrec.qual() {
+                qualities.iter().map(|q| (q - 33) as u64).sum::<u64>() / qualities.len() as u64
+            } else {
+                0
+            };
 
-        if let Some(qualities) = seqrec.qual() {
-            for (pos, q) in qualities.iter().enumerate() {
-                let rec = base_quality_count.entry(pos).or_insert_with(Vec::new);
-                rec.push(q - 33);
+            let count_qual = mean_read_qualities
+                .entry(mean_read_quality)
+                .or_insert_with(|| 0);
+            *count_qual += 1;
+
+            if let Some(qualities) = seqrec.qual() {
+                for (pos, q) in qualities.iter().enumerate() {
+                    let rec = base_quality_count.entry(pos).or_insert_with(Vec::new);
+                    rec.push(q - 33);
+                }
             }
-        }
 
-        for (pos, base) in sequence.iter().enumerate() {
-            let pos_count = base_count.entry(pos).or_insert_with(|| {
-                "ACGTN"
-                    .chars()
-                    .map(|c| (c, 0_u64))
-                    .collect::<HashMap<_, _>>()
-            });
-            let count = pos_count.get_mut(&(*base as char)).expect("Invalid base");
-            *count += 1;
-        }
+            for (pos, base) in sequence.iter().enumerate() {
+                let pos_count = base_count.entry(pos).or_insert_with(|| {
+                    "ACGTN"
+                        .chars()
+                        .map(|c| (c, 0_u64))
+                        .collect::<HashMap<_, _>>()
+                });
+                let count = pos_count.get_mut(&(*base as char)).expect("Invalid base");
+                *count += 1;
+            }
 
-        let norm_seq = seqrec.normalize(false);
-        let rc = norm_seq.reverse_complement();
-        for (_, kmer, _) in norm_seq.canonical_kmers(k, &rc) {
-            let count = kmers.entry(kmer.to_owned()).or_insert_with(|| 0_u64);
-            *count += 1;
+            let norm_seq = seqrec.normalize(false);
+            let rc = norm_seq.reverse_complement();
+            for (_, kmer, _) in norm_seq.canonical_kmers(k, &rc) {
+                let count = kmers.entry(kmer.to_owned()).or_insert_with(|| 0_u64);
+                *count += 1;
+            }
+        } else {
+            broken_read = true;
         }
     }
     // Average gc content
@@ -219,6 +225,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     let local: DateTime<Local> = Local::now();
     context.insert("time", &local.format("%a %b %e %T %Y").to_string());
     context.insert("version", &env!("CARGO_PKG_VERSION"));
+    context.insert("invalid_reads", &broken_read);
     let html = templates.render("report.html.tera", &context)?;
     io::stdout().write_all(html.as_bytes())?;
 
