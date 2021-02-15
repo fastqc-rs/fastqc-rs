@@ -25,7 +25,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     let mut kmers = HashMap::new();
     let mut gc_content = Vec::new();
     let mut read_count = 0_u64;
-    let mut reader = parse_fastx_file(&filename).expect("valid path/file");
+    let mut reader = parse_fastx_file(&filename).expect("Invalid path/file");
     let mut broken_read = false;
 
     // Gather data from every record

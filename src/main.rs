@@ -27,10 +27,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         )
         .arg(
             Arg::new("summary")
-                .about("Creates an output file for usage with MultiQC under the given path. The default path is the current working directory.")
+                .about("Creates an output file for usage with MultiQC under the given path.")
                 .takes_value(true)
                 .required(false)
-                .default_value(".")
                 .short('s'),
         )
         .get_matches();
