@@ -108,7 +108,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
                     let (base, pct) = (*b, *count as f64 / tmp_sum as f64);
                     if base == 'N' && pct >= 20_f64 {
                         n_warn = "fail"
-                    } else if base == 'N' && pct >= 5_f64 {
+                    } else if base == 'N' && pct >= 5_f64 && n_warn != "fail" {
                         n_warn = "warn"
                     };
                     (base, pct)
@@ -123,7 +123,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
             / tmp_sum as f64;
         if gc_diff >= 20_f64 || tg_diff >= 20_f64 {
             base_warning = "fail"
-        } else if (gc_diff >= 10_f64 || tg_diff >= 10_f64) && base_warning == "pass" {
+        } else if (gc_diff >= 10_f64 || tg_diff >= 10_f64) && base_warning != "fail" {
             base_warning = "warn"
         }
         for (base, count) in bases {
@@ -215,7 +215,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         let values = quartiles.values();
         if values.get(2).unwrap() <= &20_f32 {
             base_quality_warn = "fail"
-        } else if values.get(2).unwrap() <= &25_f32 {
+        } else if values.get(2).unwrap() <= &25_f32 && base_quality_warn != "fail" {
             base_quality_warn = "warn"
         }
         base_per_pos_data.push(json!({
