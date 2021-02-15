@@ -30,9 +30,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
 
     // Gather data from every record
     while let Some(record) = reader.next() {
-        if record.is_ok() {
-            let seqrec = record.expect("Invalid record");
-
+        if let Ok(seqrec) = record {
             read_count += 1;
 
             let sequence = seqrec.seq();
@@ -92,9 +90,11 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     let avg_gc = gc_content.iter().sum::<usize>() as f32 / gc_content.len() as f32;
 
     // Data for base per position
+    let mut n_warn = "pass";
     let mut base_count_data = Vec::new();
     let mut base_count_percentage = HashMap::new();
     let mut gc_content_per_base = HashMap::new();
+    let mut base_warning = "pass";
     for (position, bases) in base_count {
         let tmp_sum = bases.values().sum::<u64>();
         let tmp_gc = (bases.get(&'G').unwrap() + bases.get(&'C').unwrap()) as f64
@@ -104,9 +104,28 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
             position,
             bases
                 .iter()
-                .map(|(b, count)| (*b, *count as f64 / tmp_sum as f64))
+                .map(|(b, count)| {
+                    let (base, pct) = (*b, *count as f64 / tmp_sum as f64);
+                    if base == 'N' && pct >= 20_f64 {
+                        n_warn = "fail"
+                    } else if base == 'N' && pct >= 5_f64 {
+                        n_warn = "warn"
+                    };
+                    (base, pct)
+                })
                 .collect::<HashMap<char, f64>>(),
         );
+        let gc_diff = i64::abs(*bases.get(&'G').unwrap() as i64 - *bases.get(&'C').unwrap() as i64)
+            as f64
+            / tmp_sum as f64;
+        let tg_diff = i64::abs(*bases.get(&'T').unwrap() as i64 - *bases.get(&'G').unwrap() as i64)
+            as f64
+            / tmp_sum as f64;
+        if gc_diff >= 20_f64 || tg_diff >= 20_f64 {
+            base_warning = "fail"
+        } else if (gc_diff >= 10_f64 || tg_diff >= 10_f64) && base_warning == "pass" {
+            base_warning = "warn"
+        }
         for (base, count) in bases {
             base_count_data.push(json!({"pos": position, "count": count, "base": base}));
         }
@@ -117,6 +136,11 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     bpp_specs["data"]["values"] = json!(base_count_data);
 
     // Data for read lengths
+    let read_length_warn = if read_lengths.len() > 1 {
+        "warn"
+    } else {
+        "pass"
+    };
     let mut read_length_data = Vec::new();
     let mut read_length_sum = 0_u64;
     for (length, count) in &read_lengths {
@@ -146,15 +170,21 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     }
 
     let mut overly_represented = Vec::new();
+    let mut overly_represented_warn = "pass";
+    let total_kmers = kmers.iter().map(|(_, count)| count).sum::<u64>();
     for (km, occ) in kmers
         .iter()
         .sorted_by(|(_, a), (_, b)| Ord::cmp(&b, &a))
         .take(5)
     {
-        let percentage = *occ as f64 / kmers.len() as f64;
+        let percentage = *occ as f64 / total_kmers as f64;
         if percentage >= 1_f64 {
+            overly_represented_warn = "fail";
             overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "Yes"}));
         } else if percentage >= 0.2_f64 {
+            if overly_represented_warn != "fail" {
+                overly_represented_warn = "warn";
+            }
             overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "No"}));
         };
     }
@@ -177,11 +207,17 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     gc_specs["data"]["values"] = json!(gc_data);
 
     // Data for base quality per position
+    let mut base_quality_warn = "pass";
     let mut base_per_pos_data = Vec::new();
     for (position, qualities) in base_quality_count {
         let quartiles = Quartiles::new(&qualities);
         let avg = qualities.iter().map(|q| *q as f64).sum::<f64>() / qualities.len() as f64;
         let values = quartiles.values();
+        if values.get(2).unwrap() <= &20_f32 {
+            base_quality_warn = "fail"
+        } else if values.get(2).unwrap() <= &25_f32 {
+            base_quality_warn = "warn"
+        }
         base_per_pos_data.push(json!({
         "pos": position,
         "average": avg,
@@ -242,11 +278,15 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         context.insert("bpp_data", &base_per_pos_data);
         context.insert("mean_read_quality_data", &mean_read_quality_data);
         context.insert("base_count", &base_count_percentage);
+        context.insert("base_warning", &base_warning);
         context.insert("read_lengths", &read_lengths);
+        context.insert("read_length_warn", &read_length_warn);
         context.insert("gc_data", &gc_data);
         context.insert("gc_per_base", &gc_content_per_base);
         context.insert("overly_represented", &overly_represented);
-        context.insert("or_empty", &overly_represented.is_empty());
+        context.insert("overly_represented_warn", &overly_represented_warn);
+        context.insert("n_warn", &n_warn);
+        context.insert("base_quality_warn", &base_quality_warn);
         let txt = templates.render("fastqc_summary.txt.tera", &context)?;
         let mut file = File::create(output_path.join("fastqc_data.txt"))?;
         file.write_all(txt.as_bytes())?;

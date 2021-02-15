@@ -2,14 +2,12 @@
 >>Basic Statistics	pass
 #Measure	Value	
 Filename	{{ filename }}
-File type	Conventional base calls	
-Encoding	Sanger / Illumina 1.9	
 Total Sequences	{{ reads }}
 Filtered Sequences	0	
 Sequence length	{{ avg_read_length }}
 %GC	{{ avg_gc }}
 >>END_MODULE
->>Per base sequence quality	pass
+>>Per base sequence quality	{{ base_quality_warn }}
 #Base	Mean	Median	Lower Quartile	Upper Quartile	10th Percentile	90th Percentile
 {% for entry in bpp_data %}{{ entry.pos }}	{{ entry.average }}	{{ entry.median }}	{{ entry.lower }}	{{ entry.upper }}	{{ entry.q1 }}	{{ entry.q3 }}
 {% endfor %}>>END_MODULE
@@ -17,7 +15,7 @@ Sequence length	{{ avg_read_length }}
 #Quality	Count
 {% for entry in mean_read_quality_data %}{{ entry.score}}	{{ entry.count }}
 {% endfor %}>>END_MODULE
->>Per base sequence content	pass
+>>Per base sequence content	{{ base_warning }}
 #Base	G	A	T	C
 {% for pos, base_map in base_count %}{{ pos }}	{{ base_map["G"] }}	{{ base_map["A"] }}	{{ base_map["T"] }}	{{ base_map["C"] }}
 {% endfor %}>>END_MODULE
@@ -29,19 +27,17 @@ Sequence length	{{ avg_read_length }}
 #GC Content	Count
 {% for entry in gc_data %}{{ entry.gc_pct}}	{{ entry.count}}
 {% endfor %}>>END_MODULE
->>Per base N content	pass
+>>Per base N content	{{ n_warn }}
 #Base	N-Count
 {% for pos, base_map in base_count %}{{ pos }}	{{ base_map["N"] }}
 {% endfor %}>>END_MODULE
->>Sequence Length Distribution	pass
+>>Sequence Length Distribution	{{ read_length_warn }}
 #Length	Count
 {% for len, count in read_lengths %}{{ len }}	{{ count }}
 {% endfor %}>>END_MODULE
->>Sequence Duplication Levels	pass
+>>Overrepresented sequences	pass
 >>END_MODULE
->>Overrepresented sequences	{% if or_empty %}pass{% else %}warn{% endif %}
-{% if not or_empty %}#Sequence	Count	Percentage	Possible Source
-{% for entry in overly_represented %}{{ entry.k_mer}}	{{ entry.count}}	{{ entry.pct}}	{{ entry.or}} Hit
+>>Kmer Content	{{ overly_represented_warn }}
+{% if overly_represented %}#Sequence	Count	Percentage
+{% for entry in overly_represented %}{{ entry.k_mer}}	{{ entry.count}}	{{ entry.pct}}
 {% endfor %}{% endif %}>>END_MODULE
->>Kmer Content	fail
->>END_MODULE
