@@ -17,6 +17,8 @@ Available statistics are:
 - k-mer content
 - GC content
 
+For a detailed list of changes, take a look at the [CHANGELOG](CHANGELOG.md).
+
 ## Installation
 
 There are multiple ways to install fastqc-rs:
