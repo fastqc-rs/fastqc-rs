@@ -1,7 +1,7 @@
 # fastqc-rs
 
 ![Rust](https://github.com/fxwiegand/fastqc-rs/workflows/Rust/badge.svg)
-[![Crates.io](https://img.shields.io/crates/d/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
+[![Crates.io](https://img.shields.io/crates/d/fastqc-rs.svg?label=crates.io%20downloads)](https://crates.io/crates/fastqc-rs)
 [![Crates.io](https://img.shields.io/crates/v/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
 [![Crates.io](https://img.shields.io/crates/l/fastqc-rs.svg)](https://crates.io/crates/fastqc-rs)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/fastqc-rs/README.html)
