@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.1] - 2021-03-18
+### Changed
+- Fix for the [MultiQC](https://multiqc.info) summary.
+
 ## [0.2.0] - 2021-02-15
 ### Changed
 - Various fixes for the [MultiQC](https://multiqc.info) summary.
