@@ -7,7 +7,7 @@
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/fastqc-rs/README.html)
 [![Bioconda downloads](https://img.shields.io/conda/dn/bioconda/fastqc-rs?label=bioconda%20downloads)](https://anaconda.org/bioconda/fastqc-rs)
 
-A fast quality control tool for FASTQ files written in rust inspired by [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+A fast quality control tool for FASTQ files written in rust inspired by [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Results are written to `stdout` as a self containing html report with visualizations for all statistics. Summary files for usage with [MultiQC](https://multiqc.info) can also be generated.
 
 Available statistics are:
 - Read length
