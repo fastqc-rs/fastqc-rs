@@ -1,4 +1,4 @@
-# fastqc-rs
+# <img src="./img/fastqc-rs-ferris.svg" width=100em alt="fastqc-rs logo" /> fastqc-rs
 
 ![Rust](https://github.com/fxwiegand/fastqc-rs/workflows/Rust/badge.svg)
 [![Crates.io](https://img.shields.io/crates/d/fastqc-rs.svg?label=crates.io%20downloads)](https://crates.io/crates/fastqc-rs)
