@@ -5,7 +5,7 @@ authors = ["Felix Wiegand <fxwiegand@gmail.com>"]
 edition = "2018"
 license = "MIT"
 description = "A fast quality control tool for FASTQ files written in rust"
-repository = "https://github.com/fxwiegand/fastqc-rs"
+repository = "https://github.com/fastqc-rs/fastqc-rs"
 keywords = ["fastq"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
