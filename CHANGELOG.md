@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.2] - 2021-05-14
+### Changed
+- Minor cosmetic changes and transferring fastqc-rs to its own organization.
+
 ## [0.2.1] - 2021-03-18
 ### Changed
 - Fix for the [MultiQC](https://multiqc.info) summary.
