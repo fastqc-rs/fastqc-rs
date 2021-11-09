@@ -12,6 +12,7 @@ keywords = ["fastq"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+ahash = "0.7"
 needletail = "0.4.0"
 clap = "3.0.0-beta.2"
 serde_json = "1.0.62"
@@ -28,3 +29,4 @@ path = "src/main.rs"
 [profile.release]
 lto = "fat"
 codegen-units = 1
+debug = 1

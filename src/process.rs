@@ -1,10 +1,10 @@
+use crate::hash::TxHashMap as HashMap;
 use chrono::{DateTime, Local};
 use itertools::Itertools;
 use needletail::{parse_fastx_file, Sequence};
 use plotters::prelude::*;
 use serde_json::json;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs::File;
@@ -18,11 +18,11 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     k: u8,
     summary: Option<P>,
 ) -> Result<(), Box<dyn Error>> {
-    let mut mean_read_qualities = HashMap::new();
-    let mut base_count = HashMap::new();
-    let mut base_quality_count = HashMap::new();
-    let mut read_lengths = HashMap::new();
-    let mut kmers = HashMap::new();
+    let mut mean_read_qualities = HashMap::default();
+    let mut base_count = HashMap::default();
+    let mut base_quality_count = HashMap::default();
+    let mut read_lengths = HashMap::default();
+    let mut kmers = HashMap::default();
     let mut gc_content = Vec::new();
     let mut read_count = 0_u64;
     let mut reader = parse_fastx_file(&filename).expect("Invalid path/file");
@@ -37,15 +37,11 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
             let count_read_length = read_lengths.entry(sequence.len()).or_insert_with(|| 0_u64);
             *count_read_length += 1;
 
-            let gc = sequence
-                .iter()
-                .filter(|b| b == &&b'G' || b == &&b'C' || b == &&b'g' || b == &&b'c')
-                .count();
-            let without_n = sequence
-                .iter()
-                .filter(|b| b != &&b'N' && b != &&b'n')
-                .count();
-            gc_content.push((gc * 100) / without_n);
+            let (gc, without_n) = sequence.iter().fold((0usize, 0usize), |(gc, wn), &b| match b {
+                b'G' | b'C' | b'g' | b'c' => (gc + 1, wn + 1),
+                b'N' | b'n' => (gc, wn),
+                _ => (gc, wn + 1),
+            });
 
             let mean_read_quality = if let Some(qualities) = seqrec.qual() {
                 qualities.iter().map(|q| (q - 33) as u64).sum::<u64>() / qualities.len() as u64
@@ -92,8 +88,8 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     // Data for base per position
     let mut n_warn = "pass";
     let mut base_count_data = Vec::new();
-    let mut base_count_percentage = HashMap::new();
-    let mut gc_content_per_base = HashMap::new();
+    let mut base_count_percentage = HashMap::default();
+    let mut gc_content_per_base = HashMap::default();
     let mut base_warning = "pass";
     for (position, bases) in base_count {
         let tmp_sum = bases.values().sum::<u64>();
@@ -194,7 +190,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
 
     // Data for GC content
     let mut gc_data = Vec::new();
-    let mut temp_gc = HashMap::new();
+    let mut temp_gc = HashMap::default();
     for content in gc_content {
         let count = temp_gc.entry(content).or_insert_with(|| 0_u64);
         *count += 1;
@@ -296,7 +292,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
 
 fn embed_source(
     value: &tera::Value,
-    _: &HashMap<String, tera::Value>,
+    _: &std::collections::HashMap<String, tera::Value>,
 ) -> tera::Result<tera::Value> {
     let url = tera::try_get_value!("upper", "value", String, value);
     let source = reqwest::get(&url).unwrap().text().unwrap();
