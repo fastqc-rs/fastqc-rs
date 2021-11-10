@@ -37,15 +37,15 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
             let count_read_length = read_lengths.entry(sequence.len()).or_insert_with(|| 0_u64);
             *count_read_length += 1;
 
-            let gc: Vec<_> = sequence
+            let gc = sequence
                 .iter()
                 .filter(|b| b == &&b'G' || b == &&b'C' || b == &&b'g' || b == &&b'c')
-                .collect();
-            let without_n: Vec<_> = sequence
+                .count();
+            let without_n = sequence
                 .iter()
                 .filter(|b| b != &&b'N' && b != &&b'n')
-                .collect();
-            gc_content.push((gc.len() * 100) / without_n.len());
+                .count();
+            gc_content.push((gc * 100) / without_n);
 
             let mean_read_quality = if let Some(qualities) = seqrec.qual() {
                 qualities.iter().map(|q| (q - 33) as u64).sum::<u64>() / qualities.len() as u64
@@ -180,12 +180,12 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         let percentage = *occ as f64 / total_kmers as f64;
         if percentage >= 1_f64 {
             overly_represented_warn = "fail";
-            overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "Yes"}));
+            overly_represented.push(json!({"k_mer": std::str::from_utf8(km).unwrap(), "count": occ, "pct": percentage, "or": "Yes"}));
         } else if percentage >= 0.2_f64 {
             if overly_represented_warn != "fail" {
                 overly_represented_warn = "warn";
             }
-            overly_represented.push(json!({"k_mer": std::str::from_utf8(&km).unwrap(), "count": occ, "pct": percentage, "or": "No"}));
+            overly_represented.push(json!({"k_mer": std::str::from_utf8(km).unwrap(), "count": occ, "pct": percentage, "or": "No"}));
         };
     }
 
