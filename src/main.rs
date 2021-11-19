@@ -1,4 +1,3 @@
-mod hash;
 mod process;
 
 use clap::{App, Arg};
