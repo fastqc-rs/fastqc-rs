@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.0] - 2021-11-19
+### Changed
+- Major performance upgrade by using a more performant hash function ([#6](https://github.com/fastqc-rs/fastqc-rs/pull/6)). 
+
 ## [0.2.2] - 2021-05-14
 ### Changed
 - Minor cosmetic changes and transferring fastqc-rs to its own organization.
