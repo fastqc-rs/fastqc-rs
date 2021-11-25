@@ -58,7 +58,7 @@ fn quartiles(hist: &[usize]) -> [f32; 5] {
     let iqr = ret[3] - ret[1];
     ret[0] = ret[1] - 1.5 * iqr;
     ret[4] = ret[3] + 1.5 * iqr;
-    return ret;
+    ret
 }
 
 pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
