@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let matches = App::new("fastqc-rs")
-        .version("0.1")
+        .version("0.3.1-alpha.1")
         .author("Felix W. <fxwiegand@wgdnet.de>")
         .about("A quality control tool for FASTQ files written in rust")
         .arg(
