@@ -11,7 +11,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .about("A quality control tool for FASTQ files written in rust")
         .arg(
             Arg::new("fastq")
-                .about("The input FASTQ file to use.")
+                .help("The input FASTQ file to use.")
                 .takes_value(true)
                 .required(true)
                 .short('q')
@@ -19,7 +19,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         )
         .arg(
             Arg::new("k")
-                .about("The length k of k-mers for k-mer counting.")
+                .help("The length k of k-mers for k-mer counting.")
                 .takes_value(true)
                 .required(false)
                 .default_value("5")
@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         )
         .arg(
             Arg::new("summary")
-                .about("Creates an output file for usage with MultiQC under the given path.")
+                .help("Creates an output file for usage with MultiQC under the given path.")
                 .takes_value(true)
                 .required(false)
                 .short('s'),
