@@ -1,6 +1,6 @@
 [package]
 name = "fastqc-rs"
-version = "0.3.1-alpha.0"
+version = "0.3.1"
 authors = ["Felix Wiegand <fxwiegand@gmail.com>"]
 edition = "2018"
 license = "MIT"
