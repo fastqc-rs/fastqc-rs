@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] - 2022-01-26
+### Changed
+- Compiling problems with recent clap versions ([#8](https://github.com/fastqc-rs/fastqc-rs/pull/8)).
+- Removed `Cargo.lock` from `.gitignore`.
+
 ## [0.3.0] - 2021-11-19
 ### Changed
 - Major performance upgrade by using a more performant hash function ([#6](https://github.com/fastqc-rs/fastqc-rs/pull/6)). 
