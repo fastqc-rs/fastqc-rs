@@ -33,7 +33,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .value_name("K")
                 .help("The length k of k-mers for k-mer counting.")
                 .default_value("5")
-                .value_parser(clap::value_parser!(String)),
+                .value_parser(clap::value_parser!(u8)),
         )
         .arg(
             Arg::new("summary")
@@ -46,11 +46,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .get_matches();
 
     let fastq_file = matches.get_one::<String>("fastq").unwrap();
-    let k: u8 = matches
-        .get_one::<String>("k")
-        .unwrap()
-        .parse()
-        .expect("K should be a valid number");
+    let k = *matches.get_one::<u8>("k").unwrap();
     let summary = matches.get_one::<String>("summary");
 
     crate::process::process(fastq_file, k, summary)
