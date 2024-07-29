@@ -11,7 +11,6 @@ pub fn init_log() -> u64 {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let _ = init_log();
 
     let matches = Command::new("fastqc-rs")
         .about("A FASTQ quality control tool inspired by fastQC")
@@ -40,6 +39,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .short('s')
                 .long("summary")
                 .value_name("FILE")
+                .required(false)
                 .help("Creates an output file for usage with MultiQC under the given path.")
                 .value_parser(clap::value_parser!(String)),
         )
