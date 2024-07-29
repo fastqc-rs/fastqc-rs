@@ -24,7 +24,7 @@ log = { version = "0.4" }
 env_logger = { version = "0.11" }
 
 [[bin]]
-name = "fastqc"
+name = "fqc"
 path = "src/main.rs"
 
 [profile.release]

@@ -1,8 +1,8 @@
 mod process;
 
 use clap::{Arg, Command};
-use std::error::Error;
 use env_logger::Builder;
+use std::error::Error;
 
 pub fn init_log() -> u64 {
     Builder::from_default_env().init();
@@ -24,7 +24,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .value_name("FILE")
                 .help("The input FASTQ file to use.")
                 .required(true)
-                .value_parser(clap::value_parser!(String))
+                .value_parser(clap::value_parser!(String)),
         )
         .arg(
             Arg::new("k")
@@ -33,7 +33,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .value_name("K")
                 .help("The length k of k-mers for k-mer counting.")
                 .default_value("5")
-                .value_parser(clap::value_parser!(String))
+                .value_parser(clap::value_parser!(String)),
         )
         .arg(
             Arg::new("summary")
@@ -41,15 +41,16 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .long("summary")
                 .value_name("FILE")
                 .help("Creates an output file for usage with MultiQC under the given path.")
-                .value_parser(clap::value_parser!(String))
+                .value_parser(clap::value_parser!(String)),
         )
         .get_matches();
 
     let fastq_file = matches.get_one::<String>("fastq").unwrap();
-    let k: u8 = matches.get_one::<String>("k")
-                       .unwrap()
-                       .parse()
-                       .expect("K should be a valid number");
+    let k: u8 = matches
+        .get_one::<String>("k")
+        .unwrap()
+        .parse()
+        .expect("K should be a valid number");
     let summary = matches.get_one::<String>("summary");
 
     crate::process::process(fastq_file, k, summary)
