@@ -11,7 +11,6 @@ pub fn init_log() -> u64 {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-
     let matches = Command::new("fastqc-rs")
         .about("A FASTQ quality control tool inspired by fastQC")
         .version("0.3.3")
