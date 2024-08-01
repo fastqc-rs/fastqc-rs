@@ -1,40 +1,52 @@
 mod process;
 
-use clap::{App, Arg};
+use clap::{Arg, Command};
+use env_logger::Builder;
 use std::error::Error;
-use std::str::FromStr;
+
+pub fn init_log() -> u64 {
+    Builder::from_default_env().init();
+    println!("\n ************** initializing logger *****************\n");
+    1
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let matches = App::new("fastqc-rs")
-        .version(env!("CARGO_PKG_VERSION"))
+    let matches = Command::new("fastqc-rs")
+        .about("A FASTQ quality control tool inspired by fastQC")
+        .version("0.3.3")
         .author("Felix W. <fxwiegand@wgdnet.de>")
-        .about("A quality control tool for FASTQ files written in rust")
         .arg(
             Arg::new("fastq")
-                .help("The input FASTQ file to use.")
-                .takes_value(true)
-                .required(true)
                 .short('q')
-                .long("fastq"),
+                .long("fastq")
+                .value_name("FILE")
+                .help("The input FASTQ file to use.")
+                .required(true)
+                .value_parser(clap::value_parser!(String)),
         )
         .arg(
             Arg::new("k")
+                .short('k')
+                .long("kmer")
+                .value_name("K")
                 .help("The length k of k-mers for k-mer counting.")
-                .takes_value(true)
-                .required(false)
                 .default_value("5")
-                .short('k'),
+                .value_parser(clap::value_parser!(u8)),
         )
         .arg(
             Arg::new("summary")
-                .help("Creates an output file for usage with MultiQC under the given path.")
-                .takes_value(true)
+                .short('s')
+                .long("summary")
+                .value_name("FILE")
                 .required(false)
-                .short('s'),
+                .help("Creates an output file for usage with MultiQC under the given path.")
+                .value_parser(clap::value_parser!(String)),
         )
         .get_matches();
 
-    let k = u8::from_str(matches.value_of("k").unwrap())?;
-    let summary = matches.value_of("summary");
-    crate::process::process(matches.value_of("fastq").unwrap(), k, summary)
+    let fastq_file = matches.get_one::<String>("fastq").unwrap();
+    let k = *matches.get_one::<u8>("k").unwrap();
+    let summary = matches.get_one::<String>("summary");
+
+    crate::process::process(fastq_file, k, summary)
 }
