@@ -45,7 +45,7 @@
                         <a class="nav-link">version {{ version }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="hhttps://github.com/fxwiegand/fastqc-rs">github</a>
+                        <a class="nav-link" href="https://github.com/fastqc-rs/fastqc-rs">github</a>
                     </li>
                 </ul>
                 <span class="navbar-text">
