@@ -44,14 +44,69 @@ Download the source code and within the root directory of source run
 
 ## Usage
 
-```
+### Basic Usage
+
+Generate an HTML report (output to stdout):
+
+```bash
 fqc -q path/to/my_sequence.fastq > report.html
 ```
 
-Arguments: 
+### Command-Line Arguments
 
-| Parameter                 | Default       | Description   |	
-| :------------------------ |:-------------:| :-------------|
-| -q --fastq 	       |	-           |The path to the FASTQ file to use
-| -k          | 5           |The length k of k-mers for k-mer counting
-| -s --summary          | -           |Creates an output file for usage with [MultiQC](https://multiqc.info) under the given path
+| Parameter        | Default | Description |
+| :--------------- | :-----: | :---------- |
+| `-q --fastq`     | -       | **(Required)** The path to the FASTQ file to analyze (supports `.fastq`, `.fastq.gz`, `.fq`, `.fq.gz`) |
+| `-k --kmer`      | 5       | The length k of k-mers for k-mer counting (detects over-represented sequences) |
+| `-s --summary`   | -       | Output directory for MultiQC summary file (`fastqc_data.txt` will be created) |
+
+### Examples
+
+#### 1. Basic HTML report
+
+```bash
+fqc -q sample.fastq > report.html
+```
+
+#### 2. Compressed FASTQ input
+
+```bash
+# Automatically handles .gz compressed files
+fqc -q sample.fastq.gz > report.html
+```
+
+#### 3. Custom k-mer length
+
+```bash
+# Use k=7 for more specific sequence detection
+fqc -q sample.fastq -k 7 > report.html
+```
+
+#### 4. Generate MultiQC summary
+
+```bash
+# Creates fastqc_data.txt in the specified directory
+fqc -q sample.fastq -s output_dir/ > report.html
+```
+
+#### 5. Batch processing multiple files
+
+```bash
+# Process all FASTQ files in a directory
+for file in *.fastq.gz; do
+    name=$(basename "$file" .fastq.gz)
+    fqc -q "$file" -s "output/$name/" > "reports/$name.html"
+done
+```
+
+#### 6. Parallel batch processing
+
+```bash
+# Using GNU parallel for faster processing
+ls *.fastq.gz | parallel -j 4 'fqc -q {} -s output/{/.}/ > reports/{/.}.html'
+```
+
+### Output
+
+- **HTML Report**: Written to stdout, contains interactive visualizations for all statistics
+- **MultiQC Summary** (`-s`): Creates `fastqc_data.txt` compatible with [MultiQC](https://multiqc.info) for aggregating multiple samples
