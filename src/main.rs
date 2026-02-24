@@ -42,11 +42,20 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .help("Creates an output file for usage with MultiQC under the given path.")
                 .value_parser(clap::value_parser!(String)),
         )
+        .arg(
+            Arg::new("no_html")
+                .long("no-html")
+                .required(false)
+                .default_value("false")
+                .help("Skip HTML report output to stdout (useful when network is unavailable).")
+                .action(clap::ArgAction::SetTrue),
+        )
         .get_matches();
 
     let fastq_file = matches.get_one::<String>("fastq").unwrap();
     let k = *matches.get_one::<u8>("k").unwrap();
     let summary = matches.get_one::<String>("summary");
+    let skip_html = *matches.get_one::<bool>("no_html").unwrap();
 
-    crate::process::process(fastq_file, k, summary)
+    crate::process::process(fastq_file, k, summary, skip_html)
 }
