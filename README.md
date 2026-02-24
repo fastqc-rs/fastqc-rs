@@ -58,7 +58,8 @@ fqc -q path/to/my_sequence.fastq > report.html
 | :--------------- | :-----: | :---------- |
 | `-q --fastq`     | -       | **(Required)** The path to the FASTQ file to analyze (supports `.fastq`, `.fastq.gz`, `.fq`, `.fq.gz`) |
 | `-k --kmer`      | 5       | The length k of k-mers for k-mer counting (detects over-represented sequences) |
-| `-s --summary`   | -       | Output directory for MultiQC summary file (`fastqc_data.txt` will be created) |
+| `-s --summary`   | -       | Output directory for MultiQC summary file (`fastqc_data.txt` will be created). If the directory doesn't exist, it will be created automatically. |
+| `--no-html`      | false   | Skip HTML report output to stdout (useful when network is unavailable or only MultiQC summary is needed) |
 
 ### Examples
 
@@ -86,10 +87,19 @@ fqc -q sample.fastq -k 7 > report.html
 
 ```bash
 # Creates fastqc_data.txt in the specified directory
-fqc -q sample.fastq -s output_dir/ > report.html
+# If the directory doesn't exist, it will be created automatically
+fqc -q sample.fastq -s output_dir/
 ```
 
-#### 5. Batch processing multiple files
+#### 5. Generate MultiQC summary only (skip HTML)
+
+```bash
+# Skip HTML output when network is unavailable
+# Useful for batch processing without needing external JavaScript
+fqc -q sample.fastq -s output_dir/ --no-html
+```
+
+#### 6. Batch processing multiple files
 
 ```bash
 # Process all FASTQ files in a directory
@@ -99,7 +109,7 @@ for file in *.fastq.gz; do
 done
 ```
 
-#### 6. Parallel batch processing
+#### 7. Parallel batch processing
 
 ```bash
 # Using GNU parallel for faster processing
