@@ -327,6 +327,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
 
     if let Some(path) = summary {
         let output_path = Path::new(&path);
+        std::fs::create_dir_all(output_path)?;
         templates.add_raw_template(
             "fastqc_summary.txt.tera",
             include_str!("report/fastqc_summary.txt.tera"),
