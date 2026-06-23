@@ -1,5 +1,6 @@
 use chrono::{DateTime, Local};
 use itertools::Itertools;
+use needletail::errors::ParseErrorKind;
 use needletail::{parse_fastx_file, Sequence};
 use rustc_hash::FxHashMap as HashMap;
 use serde_json::json;
@@ -73,11 +74,26 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     let mut kmers = HashMap::default();
     let mut gc_content = vec![0_usize; 101];
     let mut read_count = 0_u64;
-    let mut reader = parse_fastx_file(&filename).expect("Invalid path/file");
+    // An input with no reads is valid for QC and should produce an empty report
+    // rather than aborting. needletail reports an empty uncompressed input as
+    // `EmptyFile`, and an empty gzipped input as an `Io` error once its valid but
+    // empty stream yields no bytes; treat both as zero reads. A missing path also
+    // surfaces as an `Io` error, so only swallow it when the path resolves. Any
+    // other error is propagated.
+    let mut reader = match parse_fastx_file(&filename) {
+        Ok(reader) => Some(reader),
+        Err(err)
+            if err.kind == ParseErrorKind::EmptyFile
+                || (err.kind == ParseErrorKind::Io && Path::new(&filename).exists()) =>
+        {
+            None
+        }
+        Err(err) => return Err(Box::new(err)),
+    };
     let mut broken_read = false;
 
     // Gather data from every record
-    while let Some(record) = reader.next() {
+    while let Some(record) = reader.as_mut().and_then(|reader| reader.next()) {
         if let Ok(seqrec) = record {
             read_count += 1;
 
@@ -141,7 +157,11 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
             .iter()
             .enumerate()
             .fold((0_usize, 0_usize), |(s, l), (gc, n)| (s + gc * n, l + n));
-        sum as f32 / len as f32
+        if len == 0 {
+            0_f32
+        } else {
+            sum as f32 / len as f32
+        }
     };
 
     // Data for base per position
@@ -203,7 +223,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
         read_length_sum += *length as u64 * *count as u64;
         read_length_data.push(json!({"length": length, "count": count}));
     }
-    let avg_read_length = read_length_sum / read_count as u64;
+    let avg_read_length = read_length_sum.checked_div(read_count).unwrap_or(0);
 
     let mut rle_specs: Value =
         serde_json::from_str(include_str!("report/read_lengths_specs.json"))?;
