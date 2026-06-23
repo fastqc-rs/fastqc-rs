@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.5] - 2026-06-23
+### Fixed
+- Support empty FASTQ(.gz) inputs without panic ([#21](https://github.com/fastqc-rs/fastqc-rs/pull/21)).
+### Changed
+- Update dependencies.
+
+## [0.3.4] - 2024-08-08
+### Changed
+- Update dependencies, including clap 4.5 ([#18](https://github.com/fastqc-rs/fastqc-rs/pull/18)).
+
 ## [0.3.2] - 2022-06-07
 ### Changed
 - Update dependencies
