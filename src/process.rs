@@ -66,6 +66,7 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     filename: P,
     k: u8,
     summary: Option<P>,
+    skip_html: bool,
 ) -> Result<(), Box<dyn Error>> {
     let mut mean_read_qualities = HashMap::default();
     let mut base_count = HashMap::default();
@@ -333,20 +334,26 @@ pub(crate) fn process<P: AsRef<Path> + AsRef<OsStr>>(
     });
 
     let mut templates = Tera::default();
-    templates.register_filter("embed_source", embed_source);
-    templates.add_raw_template("report.html.tera", include_str!("report/report.html.tera"))?;
     let mut context = Context::new();
-    context.insert("plots", &plots);
-    context.insert("meta", &meta);
+
+    // Always set these variables needed by summary template
     let local: DateTime<Local> = Local::now();
     context.insert("time", &local.format("%a %b %e %T %Y").to_string());
     context.insert("version", &env!("CARGO_PKG_VERSION"));
     context.insert("invalid_reads", &broken_read);
-    let html = templates.render("report.html.tera", &context)?;
-    io::stdout().write_all(html.as_bytes())?;
+
+    if !skip_html {
+        templates.register_filter("embed_source", embed_source);
+        templates.add_raw_template("report.html.tera", include_str!("report/report.html.tera"))?;
+        context.insert("plots", &plots);
+        context.insert("meta", &meta);
+        let html = templates.render("report.html.tera", &context)?;
+        io::stdout().write_all(html.as_bytes())?;
+    }
 
     if let Some(path) = summary {
         let output_path = Path::new(&path);
+        std::fs::create_dir_all(output_path)?;
         templates.add_raw_template(
             "fastqc_summary.txt.tera",
             include_str!("report/fastqc_summary.txt.tera"),
